@@ -3,10 +3,9 @@
 namespace DTApi\Http\Controllers;
 
 use DTApi\Models\Job;
-use DTApi\Http\Requests;
 use DTApi\Models\Distance;
-use Illuminate\Http\Request;
-use DTApi\Repository\BookingRepository;
+use Illuminate\Http\Request\BookingRequest;
+use DTApi\Repository\BookingRepositoryInterface;
 
 /**
  * Class BookingController
@@ -16,24 +15,27 @@ class BookingController extends Controller
 {
 
     /**
-     * @var BookingRepository
+     * @var repository
      */
     protected $repository;
 
     /**
      * BookingController constructor.
-     * @param BookingRepository $bookingRepository
+     * @param BookingRepositoryInterface $bookingRepository
      */
-    public function __construct(BookingRepository $bookingRepository)
+    public function __construct(BookingRepositoryInterface $bookingRepository)
     {
         $this->repository = $bookingRepository;
     }
 
-    /**
-     * @param Request $request
+    /**Booking Listing
+     * Get all booking list
+     * @urlparam user_id integer required Example: 1
+     * @param BookingRequest $request
+     * 
      * @return mixed
      */
-    public function index(Request $request)
+    public function index(BookingRequest $request)
     {
         if($user_id = $request->get('user_id')) {
 
@@ -42,7 +44,7 @@ class BookingController extends Controller
         }
         elseif($request->__authenticatedUser->user_type == env('ADMIN_ROLE_ID') || $request->__authenticatedUser->user_type == env('SUPERADMIN_ROLE_ID'))
         {
-            $response = $this->repository->getAll($request);
+            $response = $this->repository->getAll($request->all());
         }
 
         return response($response);
